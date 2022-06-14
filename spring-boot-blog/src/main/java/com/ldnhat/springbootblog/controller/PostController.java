@@ -7,8 +7,10 @@ import com.ldnhat.springbootblog.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,8 +20,9 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/posts")
-    public ResponseEntity<PostDto> savePost(@RequestBody PostDto postDto){
+    public ResponseEntity<PostDto> savePost(@Valid @RequestBody PostDto postDto){
         return new ResponseEntity<>(postService.savePost(postDto), HttpStatus.CREATED);
     }
 
@@ -42,12 +45,15 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostDto> editPost(@RequestBody PostDto postDto, @PathVariable(name = "id") Long id){
+    public ResponseEntity<PostDto> editPost(@Valid @RequestBody PostDto postDto,
+                                            @PathVariable(name = "id") Long id){
         PostDto postResponse = postService.editPost(postDto, id);
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<String> deletePost(@PathVariable(name = "id") Long id){
         postService.deletePostById(id);

@@ -7,6 +7,7 @@ import com.ldnhat.springbootblog.payload.PostResponse;
 import com.ldnhat.springbootblog.repository.PostRepository;
 import com.ldnhat.springbootblog.service.PostService;
 import net.bytebuddy.pool.TypePool;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired
     private PostRepository postRepository;
+
+    private ModelMapper modelMapper;
+
+    @Autowired
+    public PostServiceImpl(ModelMapper modelMapper, PostRepository postRepository) {
+        this.modelMapper = modelMapper;
+        this.postRepository = postRepository;
+    }
 
     @Override
     public PostDto savePost(PostDto postDto) {
@@ -85,21 +93,12 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostDto mapToDto(PostEntity postEntity){
-        PostDto postDto = new PostDto();
-        postDto.setId(postEntity.getId());
-        postDto.setTitle(postEntity.getTitle());
-        postDto.setContent(postEntity.getContent());
-        postDto.setDescription(postEntity.getDescription());
 
-        return postDto;
+        return modelMapper.map(postEntity, PostDto.class);
     }
 
     private PostEntity mapToEntity(PostDto postDto){
-        PostEntity postEntity = new PostEntity();
-        postEntity.setTitle(postDto.getTitle());
-        postEntity.setContent(postDto.getContent());
-        postEntity.setDescription(postDto.getDescription());
 
-        return postEntity;
+        return modelMapper.map(postDto, PostEntity.class);
     }
 }

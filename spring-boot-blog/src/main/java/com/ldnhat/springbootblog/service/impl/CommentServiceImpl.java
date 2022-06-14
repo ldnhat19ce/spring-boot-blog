@@ -9,6 +9,7 @@ import com.ldnhat.springbootblog.exception.ResourceNotFoundException;
 import com.ldnhat.springbootblog.repository.CommentRepository;
 import com.ldnhat.springbootblog.repository.PostRepository;
 import com.ldnhat.springbootblog.service.CommentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,18 @@ import java.util.stream.Collectors;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
     private CommentRepository commentRepository;
 
-    @Autowired
     private PostRepository postRepository;
+    private ModelMapper modelMapper;
+
+    @Autowired
+    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository,
+                              ModelMapper modelMapper) {
+        this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public CommentDto saveComment(Long postId, CommentDto commentDto) {
@@ -101,21 +109,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentDto mapToDto(CommentEntity commentEntity){
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(commentEntity.getId());
-        commentDto.setName(commentEntity.getName());
-        commentDto.setEmail(commentEntity.getEmail());
-        commentDto.setBody(commentEntity.getBody());
 
-        return commentDto;
+        return modelMapper.map(commentEntity, CommentDto.class);
     }
 
     private CommentEntity mapToEntity(CommentDto commentDto){
-        CommentEntity commentEntity = new CommentEntity();
-        commentEntity.setName(commentDto.getName());
-        commentEntity.setEmail(commentDto.getEmail());
-        commentEntity.setBody(commentDto.getBody());
-
-        return commentEntity;
+        return modelMapper.map(commentDto, CommentEntity.class);
     }
 }

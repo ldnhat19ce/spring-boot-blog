@@ -4,8 +4,10 @@ import com.ldnhat.springbootblog.dto.LoginDto;
 import com.ldnhat.springbootblog.dto.SignupDto;
 import com.ldnhat.springbootblog.entity.RoleEntity;
 import com.ldnhat.springbootblog.entity.UserEntity;
+import com.ldnhat.springbootblog.payload.JwtAuthResponse;
 import com.ldnhat.springbootblog.repository.RoleRepository;
 import com.ldnhat.springbootblog.repository.UserRepository;
+import com.ldnhat.springbootblog.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,13 +39,25 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
     @PostMapping("/sign-in")
-    public ResponseEntity<String> authenticateUser(@RequestBody LoginDto loginDto){
+    public ResponseEntity<JwtAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
                         loginDto.getUsernameOrEmail(), loginDto.getPassword()));
+
+        ///The SecurityContext is used to store the details of
+        // the currently authenticated user, also known as a principle.
+        // So, if you have to get the username or any other user details,
+        // you need to get this SecurityContext first. The SecurityContextHolder
+        // is a helper class, which provide access to the security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("user sign - in successfully", HttpStatus.OK);
+
+        String token = tokenProvider.generateToken(authentication);
+
+        return ResponseEntity.ok(new JwtAuthResponse(token));
     }
 
     @PostMapping("/sign-up")

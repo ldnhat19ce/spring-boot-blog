@@ -4,6 +4,8 @@ import com.ldnhat.springbootblog.dto.PostDto;
 import com.ldnhat.springbootblog.payload.PostResponse;
 import com.ldnhat.springbootblog.service.PostService;
 import com.ldnhat.springbootblog.utils.AppConstants;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,22 +13,25 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
+@Api(value = "crud api")
 @RestController
 @RequestMapping("/api")
+
 public class PostController {
 
     @Autowired
     private PostService postService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/posts")
+    @PostMapping("/v1/posts")
     public ResponseEntity<PostDto> savePost(@Valid @RequestBody PostDto postDto){
         return new ResponseEntity<>(postService.savePost(postDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/posts")
+    @GetMapping("/v1/posts")
     public PostResponse getAllPosts(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
@@ -39,14 +44,15 @@ public class PostController {
         return postService.getAllPosts(pageNo, pageSize, sortBy, sortDir);
     }
 
-    @GetMapping("/posts/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") Long id){
+
+    @GetMapping("/v1/posts/{id}")
+    public ResponseEntity<PostDto> getPostByIdV2(@PathVariable(name = "id") Long id){
 
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/posts/{id}")
+    @PutMapping("/v1/posts/{id}")
     public ResponseEntity<PostDto> editPost(@Valid @RequestBody PostDto postDto,
                                             @PathVariable(name = "id") Long id){
         PostDto postResponse = postService.editPost(postDto, id);
@@ -54,7 +60,7 @@ public class PostController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/posts/{id}")
+    @DeleteMapping("/v1/posts/{id}")
     public ResponseEntity<String> deletePost(@PathVariable(name = "id") Long id){
         postService.deletePostById(id);
 

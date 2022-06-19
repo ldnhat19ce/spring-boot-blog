@@ -8,6 +8,8 @@ import com.ldnhat.springbootblog.payload.JwtAuthResponse;
 import com.ldnhat.springbootblog.repository.RoleRepository;
 import com.ldnhat.springbootblog.repository.UserRepository;
 import com.ldnhat.springbootblog.security.JwtTokenProvider;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
+//the @Api annotation provided a description attribute to customize the API documentation:
+@Api(value = "Auth controller exposes sign - in and sing-up rest apis")
 public class AuthController {
 
     @Autowired
@@ -42,7 +46,8 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
-    @PostMapping("/sign-in")
+    @ApiOperation(value = "Rest Api to register or signup user to blog app")
+    @PostMapping("/v1/auth/sign-in")
     public ResponseEntity<JwtAuthResponse> authenticateUser(@RequestBody LoginDto loginDto){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
@@ -60,7 +65,7 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthResponse(token));
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping("/v1/auth/sign-up")
     public ResponseEntity<?> registerUser(@RequestBody SignupDto signupDto){
         if (userRepository.existsByUsername(signupDto.getUsername())){
             return new ResponseEntity<>("username is already taken!", HttpStatus.BAD_REQUEST);

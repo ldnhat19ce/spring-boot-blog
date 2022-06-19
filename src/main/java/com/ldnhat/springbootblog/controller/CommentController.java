@@ -17,7 +17,7 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    @PostMapping("/posts/{postId}/comments")
+    @PostMapping("/v1/posts/{postId}/comments")
     public ResponseEntity<CommentDto> saveComment(
             @PathVariable(name = "postId") Long postId,
             @Valid @RequestBody CommentDto commentDto
@@ -25,12 +25,12 @@ public class CommentController {
         return new ResponseEntity<>(commentService.saveComment(postId, commentDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/posts/{postId}/comments")
+    @GetMapping("/v1/posts/{postId}/comments")
     public List<CommentDto> getCommentsByPostId(@PathVariable(value = "postId") Long postId){
         return commentService.getCommentsByPostId(postId);
     }
 
-    @GetMapping("/posts/{postId}/comments/{commentId}")
+    @GetMapping("/v1/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentDto> getCommentById(@PathVariable(value = "postId") Long postId,
                                                      @PathVariable(value = "commentId") Long commentId){
         CommentDto commentDto = commentService.getCommentById(postId, commentId);
@@ -38,7 +38,7 @@ public class CommentController {
         return new ResponseEntity<>(commentDto, HttpStatus.OK);
     }
 
-    @PutMapping("/posts/{postId}/comments/{commentId}")
+    @PutMapping("/v1/posts/{postId}/comments/{commentId}")
     public ResponseEntity<CommentDto> editComment(@PathVariable(value = "postId") Long postId,
                                                   @PathVariable(value = "commentId") Long commentId,
                                                   @Valid @RequestBody CommentDto commentDto){
@@ -47,7 +47,7 @@ public class CommentController {
         return new ResponseEntity<>(updatedComment, HttpStatus.OK);
     }
 
-    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    @DeleteMapping("/v1/posts/{postId}/comments/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable(value = "postId") Long postId,
                                                   @PathVariable(value = "commentId") Long commentId){
         commentService.deleteComment(postId, commentId);
